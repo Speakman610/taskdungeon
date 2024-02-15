@@ -1,0 +1,59 @@
+:root {
+  --dark: #b2bbbe;
+  --light: #f4e9cd;
+  --accent: #f26419;
+  --player: #14a5a8;
+  --monster: #86132c;
+}
+
+#dungeon {
+  width: 320px;
+  height: 320px;
+  display: flex;
+  flex-wrap: wrap;
+  box-shadow:
+      var(--dark) 0 0 0 5px,
+      var(--light) 0 0 0 13px;
+  border-radius: 2px;
+}
+
+.square {
+  height: 40px;
+  width: 40px;
+  position: relative;
+}
+
+.square svg {
+  height: 30px;
+  width: 30px;
+  margin: 5px;
+  position: relative;
+  z-index: -9;
+}
+
+.monster,
+.player,
+.room {
+  position: relative;
+  z-index: 9;
+}
+
+.black-square {
+  background-color: var(--dark);
+}
+
+.white-square {
+  background-color: var(--light);
+}
+
+.room {
+  color: var(--accent)
+}
+
+.monster {
+  color: var(--monster);
+}
+
+.player {
+  color: var(--player)
+}
