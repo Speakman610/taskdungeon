@@ -3,7 +3,11 @@
   --light: #f4e9cd;
   --accent: #f26419;
   --player: #14a5a8;
-  --monster: #86132c;
+  --monster: #a31030;
+}
+
+body {
+  margin: 20px;
 }
 
 #dungeon {
@@ -15,6 +19,7 @@
       var(--dark) 0 0 0 5px,
       var(--light) 0 0 0 13px;
   border-radius: 2px;
+  margin: 20px;
 }
 
 .square {
@@ -47,7 +52,7 @@
 }
 
 .room {
-  color: var(--accent)
+  color: var(--accent);
 }
 
 .monster {
@@ -55,5 +60,6 @@
 }
 
 .player {
-  color: var(--player)
+  color: var(--player);
+  cursor: pointer;
 }

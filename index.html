@@ -4,18 +4,29 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="https://icons.veryicon.com/png/o/application/awesome-common-free-open-source-icon/chess-rook-4.png">
     <link rel="stylesheet" href="pico-main/css/pico.min.css">
     <link rel="stylesheet" href="styles.css">
-    <title>ToDo</title>
+    <title>Task Dungeon</title>
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but ToDo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-
-    <h1>ToDo</h1>
-    <div id="dungeon"></div>
+    <h1>Task Dungeon</h1>
+    <div id="game">
+      <div id="dungeon">
+        <!-- The dungeon will be generated here -->
+      </div>
+      <h3 id="info"></h3>
+    </div>
+    <div id="tasks">
+      <h2>Remaining Tasks</h2>
+      <ul id="task-list">
+        <!-- Tasks will be added here -->
+      </ul>
+      <h2>Add a Task</h2>
+      <div class="grid">
+        <input type="text" id="task-name" placeholder="Task Name"></input>
+        <button onclick="addTask()">Add</button>
+      </div>
+    </div>
 
     <script src="icons.js"></script>
     <script src="dungeon.js"></script>

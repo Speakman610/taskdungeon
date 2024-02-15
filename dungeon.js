@@ -1,5 +1,6 @@
 const dungeon = document.querySelector('#dungeon')
-const gameData = localStorage.getItem('gameData') ?? {points: 0, knights: 0, bishops: 0, rooks: 0, queens: 0}
+const gameData = {points: 0, knights: 0, bishops: 0, rooks: 0, numItems: 0, floor: 1}
+updateInfo()
 
 const EMPTY = 0
 const START = 1
@@ -64,6 +65,7 @@ function createFloor(floor, start) {
       }
     }
   }
+  gameData.numItems = numThings
 
   drawFloor(floor, rooms)
 }
@@ -141,23 +143,50 @@ function drawFloor(floor, rooms) {
           gameData.knights++
           gameData.bishops++
           gameData.rooks++
+          gameData.numItems--
           break
         case 'knight':
           gameData.knights++
+          gameData.numItems--
           break
         case 'bishop':
           gameData.bishops++
+          gameData.numItems--
           break
         case 'rook':
           gameData.rooks++
+          gameData.numItems--
           break
-        case 'queens':
-          gameData.queens++
+        case 'queen':
+          gameData.bishops++
+          gameData.rooks++
+          gameData.numItems--
           break
+        case 'stair':
+          if (gameData.points >= gameData.floor) {
+            createFloor(gameData.floor, targetId)
+            gameData.points -= gameData.floor
+            gameData.floor++
+            break
+          } else {
+            alert('Not enough points to move on to next floor')
+            return
+          }
       }
-      console.log(gameData)
+      updateInfo()
       target.append(start.firstChild)
       target.firstChild.remove()
+      if (gameData.numItems === 0) {
+        // the floor is cleared
+        const required = [stair]
+        while (required.length > 0) {
+          const index = Math.floor(Math.random() * 63) // get a number between 0 and 63
+          if (index !== targetId) {
+            const stair = document.querySelector(`[square-id="${index}"]`)
+            stair.innerHTML = required.pop()
+          }
+        }
+      }
       return
     } else {
       target.append(start.firstChild)
@@ -173,8 +202,32 @@ function drawFloor(floor, rooms) {
   })
 }
 
-function saveData() {
-  localStorage.setItem('gameData', gameData)
+function addTask() {
+  const taskInput = document.getElementById('task-name')
+  const taskName = taskInput.value.trim()
+  if (taskName === '') {
+    alert('Please name your task')
+    return
+  }
+
+  const taskList = document.getElementById('task-list')
+  const newTask = document.createElement('li')
+  newTask.textContent = taskName
+
+  // Add event listener to mark todo as completed
+  newTask.addEventListener('click', function() {
+    this.remove()
+    gameData.points++
+    updateInfo()
+  })
+
+  taskList.appendChild(newTask)
+  taskInput.value = '' // Clear input field after adding todo
 }
 
-createFloor(1, 0)
+function updateInfo() {
+  const info = document.getElementById('info')
+  info.innerText = `Floor: ${gameData.floor}\nPoints: ${gameData.points}\nKnights: ${gameData.knights}\nBishops: ${gameData.bishops}\nRooks: ${gameData.rooks}`
+}
+
+createFloor(gameData.floor, 0)
