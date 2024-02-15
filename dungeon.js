@@ -7,9 +7,17 @@ const gameData = {
   numItems: 0,
   floor: 1,
   player: 0,
-  start: true
+  start: false
 }
 updateInfo()
+document.addEventListener('player-death', (e) => {
+  setTimeout(() => {
+    gameData.player = 0
+    gameData.floor = 1
+    alert('You were captured by an enemy piece! Back to the first floor...')
+    createFloor(gameData.floor, gameData.player)
+  }, 100)
+})
 
 // Rooms and things
 const EMPTY = 0
@@ -82,7 +90,6 @@ function createFloor(floor, start) {
     }
   }
   gameData.numItems = numThings
-  gameData.start = true
 
   drawFloor(floor, rooms)
 }
@@ -103,11 +110,11 @@ function drawFloor(floor, rooms) {
         const monster = Math.floor(Math.random() * (floor + 99)) // get a number between 0 and 99 + floor
         if (monster <= 59) { // 60% chance on floor 1
           square.innerHTML = knight
-        } else if (monster <= 93) { // 34% chance on floor 1
+        } else if (monster <= 94) { // 35% chance on floor 1
           square.innerHTML = bishop
-        } else if (monster <= 98) { // 5% chance on floor 1
+        } else if (monster <= 99) { // 5% chance on floor 1
           square.innerHTML = rook
-        } else { // 1% chance on floor 1
+        } else { // 0% chance on floor 1
           square.innerHTML = queen
         }
         break
@@ -147,9 +154,7 @@ function drawFloor(floor, rooms) {
     if (movePiece(targetId, startId)) {
       gameData.player = targetId
 
-      if (gameData.start) {
-        gameData.start = false
-      } else {
+      if (!gameData.start) {
         const allSquares = document.querySelectorAll('#dungeon .square')
         allSquares.forEach(square => {
           const startId = Number(square.getAttribute('square-id'))
@@ -158,26 +163,34 @@ function drawFloor(floor, rooms) {
               case 'knight':
                 if (validateKnight(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.player = -1
                 }
                 break
               case 'bishop':
                 if (validateDiagonal(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.player = -1
                 }
                 break
               case 'rook':
                 if (validateAdjacent(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.player = -1
                 }
                 break
               case 'queen':
                 if (validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.player = -1
                 }
                 break
             }
           }
         })
+      }
+      gameData.start = false
+      if (gameData.player === -1) {
+        document.dispatchEvent(new CustomEvent('player-death'))
       }
     }
   }
@@ -237,6 +250,7 @@ function drawFloor(floor, rooms) {
         case 'stair':
           if (gameData.points >= gameData.floor) {
             createFloor(gameData.floor, targetId)
+            gameData.start = true
             gameData.points -= gameData.floor
             gameData.floor++
             break
