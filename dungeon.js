@@ -1,13 +1,14 @@
 const dungeon = document.querySelector('#dungeon')
 const gameData = {
-  points: 100,
-  knights: 10,
-  bishops: 10,
-  rooks: 10,
+  points: 0,
+  knights: 1,
+  bishops: 1,
+  rooks: 1,
   numItems: 0,
   floor: 1,
   player: 0,
-  start: false
+  start: false,
+  moved: []
 }
 updateInfo()
 document.addEventListener('player-death', (e) => {
@@ -151,10 +152,11 @@ function drawFloor(floor, rooms) {
 
     const targetId = Number(e.target.getAttribute('square-id')) || Number(e.target.parentNode.getAttribute('square-id'))
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
-    if (movePiece(targetId, startId)) {
+    if (movePlayer(targetId, startId)) {
       gameData.player = targetId
 
       if (!gameData.start) {
+        gameData.moved = []
         const allSquares = document.querySelectorAll('#dungeon .square')
         allSquares.forEach(square => {
           const startId = Number(square.getAttribute('square-id'))
@@ -164,24 +166,32 @@ function drawFloor(floor, rooms) {
                 if (validateKnight(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
+                } else {
+                  moveEnemy(startId, 'knight')
                 }
                 break
               case 'bishop':
                 if (validateDiagonal(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
+                } else {
+                  moveEnemy(startId, 'bishop')
                 }
                 break
               case 'rook':
                 if (validateAdjacent(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
+                } else {
+                  moveEnemy(startId, 'rook')
                 }
                 break
               case 'queen':
                 if (validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
+                } else {
+                  moveEnemy(startId, 'queen')
                 }
                 break
             }
@@ -195,97 +205,148 @@ function drawFloor(floor, rooms) {
     }
   }
 
-  function movePiece(targetId, startId) {
-    const target = document.querySelector(`[square-id="${targetId}"]`)
-    const start = document.querySelector(`[square-id="${startId}"]`)
-
-    if (startId === targetId || !isOccupied(startId)) return false
-
-    // Move validation
-    if (!validateDiagonal(targetId, startId, true) && !validateAdjacent(targetId, startId, true)) {
-      // Here we need to check all of the powerups they have
-      const knight = gameData.knights && validateKnight(targetId, startId)
-      const bishop = gameData.bishops && validateDiagonal(targetId, startId)
-      const rook = gameData.rooks && validateAdjacent(targetId, startId)
-
-      if (!knight && !bishop && !rook) {
-        return false
-      } else if (knight) {
-        gameData.knights--
-        updateInfo()
-      } else if (bishop) {
-        gameData.bishops--
-        updateInfo()
-      } else if (rook) {
-        gameData.rooks--
-        updateInfo()
-      }
-    }
-
-    if (isOccupied(targetId)) {
-      switch (target.firstChild.id) {
-        case 'chest':
-          gameData.knights++
-          gameData.bishops++
-          gameData.rooks++
-          gameData.numItems--
-          break
-        case 'knight':
-          gameData.knights++
-          gameData.numItems--
-          break
-        case 'bishop':
-          gameData.bishops++
-          gameData.numItems--
-          break
-        case 'rook':
-          gameData.rooks++
-          gameData.numItems--
-          break
-        case 'queen':
-          gameData.bishops++
-          gameData.rooks++
-          gameData.numItems--
-          break
-        case 'stair':
-          if (gameData.points >= gameData.floor) {
-            createFloor(gameData.floor, targetId)
-            gameData.start = true
-            gameData.points -= gameData.floor
-            gameData.floor++
-            break
-          } else {
-            alert(`Need ${gameData.floor - gameData.points} more points`)
-            return false
-          }
-      }
-      updateInfo()
-      target.append(start.firstChild)
-      target.firstChild.remove()
-      if (gameData.numItems === 0) {
-        // the floor is cleared
-        const required = [stair]
-        while (required.length > 0) {
-          const index = Math.floor(Math.random() * 63) // get a number between 0 and 63
-          if (index !== targetId) {
-            const stair = document.querySelector(`[square-id="${index}"]`)
-            stair.innerHTML = required.pop()
-          }
-        }
-      }
-      return true
-    } else {
-      target.append(start.firstChild)
-      return true
-    }
-  }
-
   const allSquares = document.querySelectorAll('#dungeon .square')
   allSquares.forEach(square => {
     square.addEventListener('dragstart', dragStart)
     square.addEventListener('dragover', dragOver)
     square.addEventListener('drop', dragDrop)
   })
+}
+
+function movePlayer(targetId, startId) {
+  const target = document.querySelector(`[square-id="${targetId}"]`)
+  const start = document.querySelector(`[square-id="${startId}"]`)
+
+  if (startId === targetId || !isOccupied(startId)) return false
+
+  // Move validation
+  if (!validateDiagonal(targetId, startId, true) && !validateAdjacent(targetId, startId, true)) {
+    // Here we need to check all of the powerups they have
+    const knight = gameData.knights && validateKnight(targetId, startId)
+    const bishop = gameData.bishops && validateDiagonal(targetId, startId)
+    const rook = gameData.rooks && validateAdjacent(targetId, startId)
+
+    if (!knight && !bishop && !rook) {
+      return false
+    } else if (knight) {
+      gameData.knights--
+      updateInfo()
+    } else if (bishop) {
+      gameData.bishops--
+      updateInfo()
+    } else if (rook) {
+      gameData.rooks--
+      updateInfo()
+    }
+  }
+
+  if (isOccupied(targetId)) {
+    switch (target.firstChild.id) {
+      case 'chest':
+        gameData.knights++
+        gameData.bishops++
+        gameData.rooks++
+        gameData.numItems--
+        break
+      case 'knight':
+        gameData.knights++
+        gameData.numItems--
+        break
+      case 'bishop':
+        gameData.bishops++
+        gameData.numItems--
+        break
+      case 'rook':
+        gameData.rooks++
+        gameData.numItems--
+        break
+      case 'queen':
+        gameData.bishops++
+        gameData.rooks++
+        gameData.numItems--
+        break
+      case 'stair':
+        if (gameData.points >= gameData.floor) {
+          createFloor(gameData.floor, targetId)
+          gameData.start = true
+          gameData.points -= gameData.floor
+          gameData.floor++
+          break
+        } else {
+          alert(`Need ${gameData.floor - gameData.points} more points`)
+          return false
+        }
+    }
+    updateInfo()
+    target.append(start.firstChild)
+    target.firstChild.remove()
+    if (gameData.numItems === 0) {
+      // the floor is cleared
+      const required = [stair]
+      while (required.length > 0) {
+        const index = Math.floor(Math.random() * 63) // get a number between 0 and 63
+        if (index !== targetId) {
+          const stair = document.querySelector(`[square-id="${index}"]`)
+          stair.innerHTML = required.pop()
+          stair.addEventListener('click', () => {
+            if (gameData.points >= gameData.floor) {
+              createFloor(gameData.floor, gameData.player)
+              gameData.start = true
+              gameData.points -= gameData.floor
+              gameData.floor++
+            } else {
+              alert(`Need ${gameData.floor - gameData.points} more points`)
+            }
+            updateInfo()
+          })
+        }
+      }
+    }
+    return true
+  } else {
+    target.append(start.firstChild)
+    return true
+  }
+}
+
+function moveEnemy(startId, monsterType) {
+  if (gameData.moved.includes(startId)) return
+  const possibleMoves = []
+  for (let targetId = 0; targetId < 64; targetId++) {
+    switch (monsterType) {
+      case 'knight':
+        if (validateKnight(targetId, startId) && !isOccupied(targetId)) possibleMoves.push(targetId)
+        break
+      case 'bishop':
+        if (validateDiagonal(targetId, startId) && !isOccupied(targetId)) possibleMoves.push(targetId)
+        break
+      case 'rook':
+        if (validateAdjacent(targetId, startId) && !isOccupied(targetId)) possibleMoves.push(targetId)
+        break
+      case 'queen':
+        if ((validateDiagonal(targetId, startId) || validateAdjacent(targetId, startId)) && !isOccupied(targetId)) possibleMoves.push(targetId)
+        break
+    }
+  }
+  if (possibleMoves.length) {
+    const targetId = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+    movePiece(targetId, startId)
+    gameData.moved.push(targetId)
+  }
+}
+
+function movePiece(targetId, startId) {
+  const target = document.querySelector(`[square-id="${targetId}"]`)
+  const start = document.querySelector(`[square-id="${startId}"]`)
+
+  if (isOccupied(targetId)) {
+    target.append(start.firstChild)
+    target.firstChild.remove()
+    return
+  } else {
+    target.append(start.firstChild)
+    return
+  }
 }
 
 function addTask() {
