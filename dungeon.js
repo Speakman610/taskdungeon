@@ -1,5 +1,14 @@
 const dungeon = document.querySelector('#dungeon')
-const gameData = { points: 0, knights: 0, bishops: 0, rooks: 0, numItems: 0, floor: 1 }
+const gameData = {
+  points: 100,
+  knights: 10,
+  bishops: 10,
+  rooks: 10,
+  numItems: 0,
+  floor: 1,
+  player: 0,
+  start: true
+}
 updateInfo()
 
 // Rooms and things
@@ -73,6 +82,7 @@ function createFloor(floor, start) {
     }
   }
   gameData.numItems = numThings
+  gameData.start = true
 
   drawFloor(floor, rooms)
 }
@@ -134,15 +144,49 @@ function drawFloor(floor, rooms) {
 
     const targetId = Number(e.target.getAttribute('square-id')) || Number(e.target.parentNode.getAttribute('square-id'))
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
-    movePiece(targetId, startId)
+    if (movePiece(targetId, startId)) {
+      gameData.player = targetId
+
+      if (gameData.start) {
+        gameData.start = false
+      } else {
+        const allSquares = document.querySelectorAll('#dungeon .square')
+        allSquares.forEach(square => {
+          const startId = Number(square.getAttribute('square-id'))
+          if (isOccupied(startId) && square.firstChild.classList.contains('monster')) {
+            switch (square.firstChild.id) {
+              case 'knight':
+                if (validateKnight(gameData.player, startId)) {
+                  movePiece(gameData.player, startId)
+                }
+                break
+              case 'bishop':
+                if (validateDiagonal(gameData.player, startId)) {
+                  movePiece(gameData.player, startId)
+                }
+                break
+              case 'rook':
+                if (validateAdjacent(gameData.player, startId)) {
+                  movePiece(gameData.player, startId)
+                }
+                break
+              case 'queen':
+                if (validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) {
+                  movePiece(gameData.player, startId)
+                }
+                break
+            }
+          }
+        })
+      }
+    }
   }
 
   function movePiece(targetId, startId) {
     const target = document.querySelector(`[square-id="${targetId}"]`)
     const start = document.querySelector(`[square-id="${startId}"]`)
-    const isOccupied = target.firstChild
 
-    if (startId === targetId || (!start.firstChild && !start.firstChild.classList.contains('player'))) return
+    if (startId === targetId || !isOccupied(startId)) return false
 
     // Move validation
     if (!validateDiagonal(targetId, startId, true) && !validateAdjacent(targetId, startId, true)) {
@@ -152,7 +196,7 @@ function drawFloor(floor, rooms) {
       const rook = gameData.rooks && validateAdjacent(targetId, startId)
 
       if (!knight && !bishop && !rook) {
-        return
+        return false
       } else if (knight) {
         gameData.knights--
         updateInfo()
@@ -165,7 +209,7 @@ function drawFloor(floor, rooms) {
       }
     }
 
-    if (isOccupied) {
+    if (isOccupied(targetId)) {
       switch (target.firstChild.id) {
         case 'chest':
           gameData.knights++
@@ -198,7 +242,7 @@ function drawFloor(floor, rooms) {
             break
           } else {
             alert(`Need ${gameData.floor - gameData.points} more points`)
-            return
+            return false
           }
       }
       updateInfo()
@@ -215,10 +259,10 @@ function drawFloor(floor, rooms) {
           }
         }
       }
-      return
+      return true
     } else {
       target.append(start.firstChild)
-      return
+      return true
     }
   }
 
@@ -282,7 +326,7 @@ function validateDiagonal(targetId, startId, limit = false) {
       }
     }
 
-    if (limit || isBoardEdge(currentId).bool) {
+    if (limit || isOccupied(currentId) || isBoardEdge(currentId).bool) {
       return targetId === currentId
     }
 
@@ -317,7 +361,7 @@ function validateAdjacent(targetId, startId, limit = false) {
       }
     }
 
-    if (limit || (isBoardEdge(currentId).bool && !sameEdge)) {
+    if (limit || isOccupied(currentId) || (isBoardEdge(currentId).bool && !sameEdge)) {
       return targetId === currentId
     }
 
@@ -368,6 +412,11 @@ function validateKnight(targetId, startId) {
   }
 
   return false
+}
+
+function isOccupied(id) {
+  const square = document.querySelector(`[square-id="${id}"]`)
+  return square?.firstChild
 }
 
 function isBoardEdge(id) {
