@@ -89,6 +89,8 @@ button {
 
 li {
   cursor: pointer;
+  color: var(--player);
+  font-size: x-large;
 }
 
 li:hover {
