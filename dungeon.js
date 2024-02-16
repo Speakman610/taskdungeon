@@ -13,6 +13,22 @@ const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getI
   tasks: {}
 }
 updateInfo()
+for (const [key, value] of Object.entries(gameData.tasks)) {
+  const taskList = document.getElementById('task-list')
+  const newTask = document.createElement('li')
+  newTask.textContent = `${key} (${value})`
+ 
+  // Add event listener to mark todo as completed
+  newTask.addEventListener('click', function () {
+    this.remove()
+    delete gameData.tasks[key]
+    gameData.points += Number(value)
+    updateInfo()
+  })
+
+  taskList.appendChild(newTask)
+}
+
 document.addEventListener('player-death', (e) => {
   setTimeout(() => {
     gameData.player = 0
@@ -123,6 +139,21 @@ function drawFloor(rooms) {
         break
       case END:
         square.innerHTML = stair
+        square.firstChild.addEventListener('click', () => {
+          if (gameData.points >= gameData.floor) {
+            gameData.rooms = []
+            gameData.numItems = 0
+            createFloor(gameData.floor, gameData.player)
+            gameData.start = false
+            gameData.points -= gameData.floor
+            gameData.floor++
+            // save all the current data
+            localStorage.setItem('gameData', JSON.stringify(gameData))
+          } else {
+            alert(`Need ${gameData.floor - gameData.points} more points`)
+          }
+          updateInfo()
+        })
         break
       case CHEST:
         square.innerHTML = chest
@@ -182,6 +213,7 @@ function drawFloor(rooms) {
               case 'knight':
                 if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.moved.push(gameData.player)
                   gameData.player = -1
                 } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'knight')
@@ -190,6 +222,7 @@ function drawFloor(rooms) {
               case 'bishop':
                 if (validateDiagonal(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.moved.push(gameData.player)
                   gameData.player = -1
                 } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'bishop')
@@ -198,6 +231,7 @@ function drawFloor(rooms) {
               case 'rook':
                 if (validateAdjacent(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.moved.push(gameData.player)
                   gameData.player = -1
                 } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'rook')
@@ -206,6 +240,7 @@ function drawFloor(rooms) {
               case 'queen':
                 if ((validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
+                  gameData.moved.push(gameData.player)
                   gameData.player = -1
                 } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'queen')
@@ -219,6 +254,8 @@ function drawFloor(rooms) {
       if (gameData.player === -1) {
         document.dispatchEvent(new CustomEvent('player-death'))
       }
+      // save all the current data
+      localStorage.setItem('gameData', JSON.stringify(gameData))
     }
   }
 
@@ -234,6 +271,7 @@ function movePlayer(targetId, startId) {
   const target = document.querySelector(`[square-id="${targetId}"]`)
   const start = document.querySelector(`[square-id="${startId}"]`)
 
+  // The second check should be impossible
   if (startId === targetId || !isOccupied(startId)) return false
 
   // Move validation
@@ -301,6 +339,8 @@ function movePlayer(targetId, startId) {
     updateInfo()
     target.append(start.firstChild)
     target.firstChild.remove()
+    gameData.rooms[targetId] = 0
+    updateRooms(targetId, startId)
     if (gameData.numItems === 0) {
       // the floor is cleared
       const required = [stair]
@@ -309,6 +349,7 @@ function movePlayer(targetId, startId) {
         if (index !== targetId) {
           const stair = document.querySelector(`[square-id="${index}"]`)
           stair.innerHTML = required.pop()
+          gameData.rooms[index] = END
           stair.addEventListener('click', () => {
             if (gameData.points >= gameData.floor) {
               gameData.rooms = []
@@ -329,6 +370,7 @@ function movePlayer(targetId, startId) {
     }
     return true
   } else {
+    updateRooms(targetId, startId)
     target.append(start.firstChild)
     return true
   }
@@ -362,6 +404,7 @@ function moveEnemy(startId, monsterType) {
 function movePiece(targetId, startId) {
   const target = document.querySelector(`[square-id="${targetId}"]`)
   const start = document.querySelector(`[square-id="${startId}"]`)
+  updateRooms(targetId, startId)
 
   if (isOccupied(targetId)) {
     target.append(start.firstChild)
@@ -371,6 +414,12 @@ function movePiece(targetId, startId) {
     target.append(start.firstChild)
     return
   }
+}
+
+function updateRooms(targetId, startId) {
+  const temp = gameData.rooms[targetId]
+  gameData.rooms[targetId] = gameData.rooms[startId]
+  gameData.rooms[startId] = temp
 }
 
 function addTask() {
@@ -386,10 +435,14 @@ function addTask() {
   const taskList = document.getElementById('task-list')
   const newTask = document.createElement('li')
   newTask.textContent = `${taskName} (${priority})`
+  gameData.tasks[taskName] = priority
+  // save all the current data
+  localStorage.setItem('gameData', JSON.stringify(gameData))
 
   // Add event listener to mark todo as completed
   newTask.addEventListener('click', function () {
     this.remove()
+    delete gameData.tasks[taskName]
     gameData.points += Number(priority)
     updateInfo()
   })
