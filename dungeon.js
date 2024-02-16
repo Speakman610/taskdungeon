@@ -198,7 +198,14 @@ function drawFloor(rooms) {
   function dragDrop(e) {
     e.stopPropagation()
 
-    const targetId = Number(e.target.getAttribute('square-id')) || Number(e.target.parentNode.getAttribute('square-id'))
+    let targetId = 0
+    if (e.target.getAttribute('square-id')) {
+      targetId = Number(e.target.getAttribute('square-id'))
+    } else if (e.target.parentNode.getAttribute('square-id')) {
+      targetId = Number(e.target.parentNode.getAttribute('square-id'))
+    } else if (e.target.parentNode.parentNode.getAttribute('square-id')) {
+      targetId = Number(e.target.parentNode.parentNode.getAttribute('square-id'))
+    }
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
     if (movePlayer(targetId, startId)) {
       gameData.player = targetId
