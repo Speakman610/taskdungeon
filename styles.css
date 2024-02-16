@@ -18,6 +18,9 @@ body {
   margin: 20px;
   background-color: var(--dark);
   color: var(--light);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 #dungeon {
