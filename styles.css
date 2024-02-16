@@ -1,5 +1,5 @@
 :root {
-  --dark: #b2bbbe;
+  --dark: #19353d;
   --light: #f4e9cd;
   --accent: #f26419;
   --player: #14a5a8;
@@ -8,6 +8,8 @@
 
 body {
   margin: 20px;
+  background-color: var(--dark);
+  color: var(--light);
 }
 
 #dungeon {
@@ -52,18 +54,35 @@ body {
 }
 
 .room {
-  color: var(--accent);
+  fill: var(--accent);
 }
 
 .monster {
-  color: var(--monster);
+  fill: var(--monster);
 }
 
 .player {
-  color: var(--player);
+  fill: var(--player);
   cursor: pointer;
 }
 
 #stair {
   cursor: pointer;
+}
+
+#game {
+  display: flex;
+  flex-direction: row;
+}
+
+button {
+  cursor: pointer;
+}
+
+li {
+  cursor: pointer;
+}
+
+li:hover {
+  color: var(--accent);
 }

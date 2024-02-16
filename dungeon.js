@@ -154,16 +154,16 @@ function drawFloor(floor, rooms) {
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
     if (movePlayer(targetId, startId)) {
       gameData.player = targetId
+      gameData.moved = []
 
       if (!gameData.start) {
-        gameData.moved = []
         const allSquares = document.querySelectorAll('#dungeon .square')
         allSquares.forEach(square => {
           const startId = Number(square.getAttribute('square-id'))
           if (isOccupied(startId) && square.firstChild.classList.contains('monster')) {
             switch (square.firstChild.id) {
               case 'knight':
-                if (validateKnight(gameData.player, startId)) {
+                if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
                 } else {
@@ -171,7 +171,7 @@ function drawFloor(floor, rooms) {
                 }
                 break
               case 'bishop':
-                if (validateDiagonal(gameData.player, startId)) {
+                if (validateDiagonal(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
                 } else {
@@ -179,7 +179,7 @@ function drawFloor(floor, rooms) {
                 }
                 break
               case 'rook':
-                if (validateAdjacent(gameData.player, startId)) {
+                if (validateAdjacent(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
                 } else {
@@ -187,7 +187,7 @@ function drawFloor(floor, rooms) {
                 }
                 break
               case 'queen':
-                if (validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) {
+                if ((validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
                 } else {
@@ -310,7 +310,6 @@ function movePlayer(targetId, startId) {
 }
 
 function moveEnemy(startId, monsterType) {
-  if (gameData.moved.includes(startId)) return
   const possibleMoves = []
   for (let targetId = 0; targetId < 64; targetId++) {
     switch (monsterType) {
@@ -329,6 +328,7 @@ function moveEnemy(startId, monsterType) {
     }
   }
   if (possibleMoves.length) {
+    console.log(startId, possibleMoves)
     const targetId = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
     movePiece(targetId, startId)
     gameData.moved.push(targetId)
@@ -336,6 +336,7 @@ function moveEnemy(startId, monsterType) {
 }
 
 function movePiece(targetId, startId) {
+  if (gameData.moved.includes(startId)) return
   const target = document.querySelector(`[square-id="${targetId}"]`)
   const start = document.querySelector(`[square-id="${startId}"]`)
 
@@ -352,6 +353,8 @@ function movePiece(targetId, startId) {
 function addTask() {
   const taskInput = document.getElementById('task-name')
   const taskName = taskInput.value.trim()
+  const taskPriority = document.getElementById('task-importance')
+  const priority = taskPriority.value
   if (taskName === '') {
     alert('Please name your task')
     return
@@ -359,12 +362,12 @@ function addTask() {
 
   const taskList = document.getElementById('task-list')
   const newTask = document.createElement('li')
-  newTask.textContent = taskName
+  newTask.textContent = `${taskName} (${priority})`
 
   // Add event listener to mark todo as completed
   newTask.addEventListener('click', function () {
     this.remove()
-    gameData.points++
+    gameData.points += Number(priority)
     updateInfo()
   })
 

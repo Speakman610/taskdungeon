@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="stylesheet" href="pico-main/css/pico.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Task Dungeon</title>
   </head>
   <body>
@@ -22,10 +21,13 @@
         <!-- Tasks will be added here -->
       </ul>
       <h2>Add a Task</h2>
-      <div class="grid">
-        <input type="text" id="task-name" placeholder="Task Name"></input>
-        <button onclick="addTask()">Add</button>
-      </div>
+      <input type="text" id="task-name" placeholder="Task Name"></input>
+      <select id="task-importance">
+        <option selected value="1">Low Priority</option>
+        <option value="2">Medium Priority</option>
+        <option value="3">High Priority</option>
+      </select>
+      <button onclick="addTask()">Add</button>
     </div>
 
     <script src="icons.js"></script>
