@@ -1,22 +1,26 @@
 const dungeon = document.querySelector('#dungeon')
-const gameData = {
+const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getItem('gameData')) : {
   points: 0,
   knights: 1,
   bishops: 1,
   rooks: 1,
-  numItems: 0,
   floor: 1,
+  rooms: [],
+  numItems: 0,
   player: 0,
+  moved: [],
   start: false,
-  moved: []
+  tasks: {}
 }
 updateInfo()
 document.addEventListener('player-death', (e) => {
   setTimeout(() => {
     gameData.player = 0
     gameData.floor = 1
+    gameData.start = false
     alert('You were captured by an enemy piece! Back to the first floor...')
     createFloor(gameData.floor, gameData.player)
+    updateInfo()
   }, 100)
 })
 
@@ -25,8 +29,11 @@ const EMPTY = 0
 const START = 1
 const END = 2
 const CHEST = 3
-const MINION = 4
-const BOSS = 5
+const KNIGHT = 4
+const BISHOP = 5
+const ROOK = 6
+const QUEEN = 7
+const BOSS = 8
 
 // Movement calculation
 const N_S_step = 8
@@ -62,40 +69,50 @@ const SW_NE_step = 7
   - Dragon
 */
 function createFloor(floor, start) {
-  const rooms = []
-  let numThings = 0
-  while (rooms.length < 64) {
-    if (rooms.length === start) {
-      rooms.push(START) // this will be the room the player starts in
-    } else if (rooms.length === start + W_E_step
-      || rooms.length === start - W_E_step
-      || rooms.length === start + SW_NE_step
-      || rooms.length === start - SW_NE_step
-      || rooms.length === start + N_S_step
-      || rooms.length === start - N_S_step
-      || rooms.length === start + NW_SE_step
-      || rooms.length === start - NW_SE_step) {
+  // generate the floor
+  while (gameData.rooms.length < 64) {
+    if (gameData.rooms.length === start) {
+      gameData.rooms.push(START) // this will be the room the player starts in
+    } else if (gameData.rooms.length === start + W_E_step
+      || gameData.rooms.length === start - W_E_step
+      || gameData.rooms.length === start + SW_NE_step
+      || gameData.rooms.length === start - SW_NE_step
+      || gameData.rooms.length === start + N_S_step
+      || gameData.rooms.length === start - N_S_step
+      || gameData.rooms.length === start + NW_SE_step
+      || gameData.rooms.length === start - NW_SE_step) {
       // if we are on one of the spaces surrounding the start space
-      rooms.push(EMPTY)
+      gameData.rooms.push(EMPTY)
     } else {
       const rand = Math.floor(Math.random() * 99) // get a number between 0 and 99
-      if (rand <= 69 || numThings === 2 * floor) { // 70% chance on floor 1
-        rooms.push(EMPTY)
+      if (rand <= 69 || gameData.numItems === 2 * floor) { // 70% chance on floor 1
+        gameData.rooms.push(EMPTY)
       } else if (rand <= 74) { // 5% chance on floor 1
-        rooms.push(CHEST)
-        numThings++
+        gameData.rooms.push(CHEST)
+        gameData.numItems++
       } else { // 15% chance on floor 1
-        rooms.push(MINION)
-        numThings++
+        const monster = Math.floor(Math.random() * (floor + 99)) // get a number between 0 and 99 + floor
+        if (monster <= 59) { // 60% chance on floor 1
+          gameData.rooms.push(KNIGHT)
+        } else if (monster <= 94) { // 35% chance on floor 1
+          gameData.rooms.push(BISHOP)
+        } else if (monster <= 99) { // 5% chance on floor 1
+          gameData.rooms.push(ROOK)
+        } else { // 0% chance on floor 1
+          gameData.rooms.push(QUEEN)
+        }
+        gameData.numItems++
       }
     }
   }
-  gameData.numItems = numThings
 
-  drawFloor(floor, rooms)
+  // save all the current data
+  localStorage.setItem('gameData', JSON.stringify(gameData))
+
+  drawFloor(gameData.rooms)
 }
 
-function drawFloor(floor, rooms) {
+function drawFloor(rooms) {
   dungeon.innerHTML = ''
   rooms.forEach((room, i) => {
     const square = document.createElement('div')
@@ -107,23 +124,23 @@ function drawFloor(floor, rooms) {
       case END:
         square.innerHTML = stair
         break
-      case MINION:
-        const monster = Math.floor(Math.random() * (floor + 99)) // get a number between 0 and 99 + floor
-        if (monster <= 59) { // 60% chance on floor 1
-          square.innerHTML = knight
-        } else if (monster <= 94) { // 35% chance on floor 1
-          square.innerHTML = bishop
-        } else if (monster <= 99) { // 5% chance on floor 1
-          square.innerHTML = rook
-        } else { // 0% chance on floor 1
-          square.innerHTML = queen
-        }
+      case CHEST:
+        square.innerHTML = chest
+        break
+      case KNIGHT:
+        square.innerHTML = knight
+        break
+      case BISHOP:
+        square.innerHTML = bishop
+        break
+      case ROOK:
+        square.innerHTML = rook
+        break
+      case QUEEN:
+        square.innerHTML = queen
         break
       case BOSS:
         square.innerHTML = boss
-        break
-      case CHEST:
-        square.innerHTML = chest
         break
     }
 
@@ -166,7 +183,7 @@ function drawFloor(floor, rooms) {
                 if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
-                } else {
+                } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'knight')
                 }
                 break
@@ -174,7 +191,7 @@ function drawFloor(floor, rooms) {
                 if (validateDiagonal(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
-                } else {
+                } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'bishop')
                 }
                 break
@@ -182,7 +199,7 @@ function drawFloor(floor, rooms) {
                 if (validateAdjacent(gameData.player, startId) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
-                } else {
+                } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'rook')
                 }
                 break
@@ -190,7 +207,7 @@ function drawFloor(floor, rooms) {
                 if ((validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) && !gameData.moved.includes(startId)) {
                   movePiece(gameData.player, startId)
                   gameData.player = -1
-                } else {
+                } else if (!gameData.moved.includes(startId)) {
                   moveEnemy(startId, 'queen')
                 }
                 break
@@ -267,10 +284,14 @@ function movePlayer(targetId, startId) {
         break
       case 'stair':
         if (gameData.points >= gameData.floor) {
+          gameData.rooms = []
+          gameData.numItems = 0
           createFloor(gameData.floor, targetId)
           gameData.start = true
           gameData.points -= gameData.floor
           gameData.floor++
+          // save all the current data
+          localStorage.setItem('gameData', JSON.stringify(gameData))
           break
         } else {
           alert(`Need ${gameData.floor - gameData.points} more points`)
@@ -290,10 +311,14 @@ function movePlayer(targetId, startId) {
           stair.innerHTML = required.pop()
           stair.addEventListener('click', () => {
             if (gameData.points >= gameData.floor) {
+              gameData.rooms = []
+              gameData.numItems = 0
               createFloor(gameData.floor, gameData.player)
-              gameData.start = true
+              gameData.start = false
               gameData.points -= gameData.floor
               gameData.floor++
+              // save all the current data
+              localStorage.setItem('gameData', JSON.stringify(gameData))
             } else {
               alert(`Need ${gameData.floor - gameData.points} more points`)
             }
@@ -328,7 +353,6 @@ function moveEnemy(startId, monsterType) {
     }
   }
   if (possibleMoves.length) {
-    console.log(startId, possibleMoves)
     const targetId = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
     movePiece(targetId, startId)
     gameData.moved.push(targetId)
@@ -336,7 +360,6 @@ function moveEnemy(startId, monsterType) {
 }
 
 function movePiece(targetId, startId) {
-  if (gameData.moved.includes(startId)) return
   const target = document.querySelector(`[square-id="${targetId}"]`)
   const start = document.querySelector(`[square-id="${startId}"]`)
 

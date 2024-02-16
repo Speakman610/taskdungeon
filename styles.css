@@ -1,9 +1,17 @@
 :root {
-  --dark: #19353d;
-  --light: #f4e9cd;
-  --accent: #f26419;
-  --player: #14a5a8;
-  --monster: #a31030;
+  /* faded */
+  /* --dark: #2c3437;
+  --light: #66787a;
+  --accent: #cfa790;
+  --player: #6ebcbd;
+  --monster: #70444e; */
+
+  /* bright */
+  --dark: #0f2f3b;
+  --light: #167c87;
+  --accent: #b113c2;
+  --player: #ffa324;
+  --monster: #771f34;
 }
 
 body {
