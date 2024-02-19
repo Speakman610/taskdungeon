@@ -24,6 +24,8 @@ for (const [key, value] of Object.entries(gameData.tasks)) {
     delete gameData.tasks[key]
     gameData.points += Number(value)
     updateInfo()
+    // save all the current data
+    localStorage.setItem('gameData', JSON.stringify(gameData))
   })
 
   taskList.appendChild(newTask)
@@ -133,6 +135,7 @@ function createFloor(floor, start) {
 }
 
 function drawFloor(rooms) {
+  const nextFloorCost = Math.ceil(gameData.floor / 10)
   dungeon.innerHTML = ''
   rooms.forEach((room, i) => {
     const square = document.createElement('div')
@@ -144,17 +147,17 @@ function drawFloor(rooms) {
       case END:
         square.innerHTML = stair
         square.firstChild.addEventListener('click', () => {
-          if (gameData.points >= gameData.floor) {
+          if (gameData.points >= nextFloorCost) {
             gameData.rooms = []
             gameData.numItems = 0
             createFloor(gameData.floor, gameData.player)
             gameData.start = false
-            gameData.points -= gameData.floor
+            gameData.points -= nextFloorCost
             gameData.floor++
             // save all the current data
             localStorage.setItem('gameData', JSON.stringify(gameData))
           } else {
-            alert(`Need ${gameData.floor - gameData.points} more points`)
+            alert(`Need ${nextFloorCost - gameData.points} more points`)
           }
           updateInfo()
         })
@@ -332,18 +335,19 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'stair':
-        if (gameData.points >= gameData.floor) {
+        const nextFloorCost = Math.ceil(gameData.floor / 10)
+        if (gameData.points >= nextFloorCost) {
           gameData.rooms = []
           gameData.numItems = 0
           createFloor(gameData.floor, targetId)
           gameData.start = true
-          gameData.points -= gameData.floor
+          gameData.points -= nextFloorCost
           gameData.floor++
           // save all the current data
           localStorage.setItem('gameData', JSON.stringify(gameData))
           break
         } else {
-          alert(`Need ${gameData.floor - gameData.points} more points`)
+          alert(`Need ${nextFloorCost - gameData.points} more points`)
           return false
         }
     }
