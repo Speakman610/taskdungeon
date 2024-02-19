@@ -366,17 +366,18 @@ function movePlayer(targetId, startId) {
           stair.innerHTML = required.pop()
           gameData.rooms[index] = END
           stair.addEventListener('click', () => {
-            if (gameData.points >= gameData.floor) {
+            const nextFloorCost = Math.ceil(gameData.floor / 10)
+            if (gameData.points >= nextFloorCost) {
               gameData.rooms = []
               gameData.numItems = 0
               createFloor(gameData.floor, gameData.player)
               gameData.start = false
-              gameData.points -= gameData.floor
+              gameData.points -= nextFloorCost
               gameData.floor++
               // save all the current data
               localStorage.setItem('gameData', JSON.stringify(gameData))
             } else {
-              alert(`Need ${gameData.floor - gameData.points} more points`)
+              alert(`Need ${nextFloorCost - gameData.points} more points`)
             }
             updateInfo()
           })
