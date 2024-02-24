@@ -42,6 +42,7 @@ const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getI
   start: false,
   tasks: {}
 }
+
 updateInfo()
 refreshTaskList()
 
@@ -91,39 +92,60 @@ document.addEventListener('player-death', (e) => {
 */
 function createFloor(floor, start) {
   // generate the floor
-  while (gameData.rooms.length < 64) {
-    if (gameData.rooms.length === start) {
-      gameData.rooms.push(PLAYER) // this will be the room the player starts in
-    } else if (gameData.rooms.length === start + W_E_step
-      || gameData.rooms.length === start - W_E_step
-      || gameData.rooms.length === start + SW_NE_step
-      || gameData.rooms.length === start - SW_NE_step
-      || gameData.rooms.length === start + N_S_step
-      || gameData.rooms.length === start - N_S_step
-      || gameData.rooms.length === start + NW_SE_step
-      || gameData.rooms.length === start - NW_SE_step) {
-      // if we are on one of the spaces surrounding the start space
-      gameData.rooms.push(EMPTY)
-    } else {
-      const rand = Math.floor(Math.random() * 99) // get a number between 0 and 99
-      if (rand <= 69 || gameData.numItems === 2 * floor) { // 70% chance on floor 1
-        gameData.rooms.push(EMPTY)
-      } else if (rand <= 74) { // 5% chance on floor 1
-        gameData.rooms.push(CHEST)
-        gameData.numItems++
-      } else { // 15% chance on floor 1
-        const monster = Math.floor(Math.random() * (floor + 99)) // get a number between 0 and 99 + floor
-        if (monster <= 59) { // 60% chance on floor 1
-          gameData.rooms.push(KNIGHT)
-        } else if (monster <= 94) { // 35% chance on floor 1
-          gameData.rooms.push(BISHOP)
-        } else if (monster <= 99) { // 5% chance on floor 1
-          gameData.rooms.push(ROOK)
-        } else { // 0% chance on floor 1
-          gameData.rooms.push(QUEEN)
+  if (gameData.rooms.length < 64) {
+    gameData.rooms = Array(64).fill(EMPTY)
+    gameData.rooms[start] = PLAYER
+    let floorPoints = floor + 2
+    console.log(floor, floorPoints)
+    while (floorPoints > 0) {
+      const room = Math.floor(Math.random() * 63) // select a random room
+      if (gameData.rooms[room] === EMPTY
+        && room !== start + W_E_step
+        && room !== start - W_E_step
+        && room !== start + SW_NE_step
+        && room !== start - SW_NE_step
+        && room !== start + N_S_step
+        && room !== start - N_S_step
+        && room !== start + NW_SE_step
+        && room !== start - NW_SE_step) {
+          // if we are not on one of the spaces surrounding the start space and the room is empty
+
+          /*
+          Levels:
+          1 [3] - Knight or Bishop (1)
+          2 [4] - Chest (2)
+          3 [5] - Rook (1)
+          4 [6] - Knight or Bishop (2)
+          5 [7] - Knight or Bishop (2), Pawn (1)
+          6 [8] - Rook (1), Knight or Bishop (1)
+          7 [9] - Queen (1)
+          8 [10] - Knight or Bishop (2), Chest (2)
+          9 [11] - Rook (2), Pawn (1)
+          10 [12] - Knight or Bishop (4) - BOSS FLOOR
+          */
+          if (floor % 7 === 0 && floorPoints >= 9) {
+            // queen floor
+            gameData.rooms[room] = QUEEN
+            floorPoints -= 9
+          } else if (floor % 3 === 0 && floorPoints >= 5) {
+            // rook floor
+            gameData.rooms[room] = ROOK
+            floorPoints -= 5
+          } else if (floorPoints % 3 === 0 && floorPoints >= 3) {
+            // bishop or knight
+            gameData.rooms[room] = Math.random() > Math.random() ? BISHOP : KNIGHT
+            floorPoints -= 3
+          } else if (floor % 2 === 0 && floorPoints >= 2) {
+            // chest
+            gameData.rooms[room] = CHEST
+            floorPoints -= 2
+          } else {
+            // pawn (eventually)
+            gameData.rooms[room] = CHEST
+            floorPoints -= 1
+          }
+          gameData.numItems++
         }
-        gameData.numItems++
-      }
     }
   }
 
@@ -134,7 +156,6 @@ function createFloor(floor, start) {
 }
 
 function drawFloor(rooms) {
-  const nextFloorCost = Math.ceil(gameData.floor / 10)
   dungeon.innerHTML = ''
   rooms.forEach((room, i) => {
     const square = document.createElement('div')
@@ -146,19 +167,7 @@ function drawFloor(rooms) {
       case DOOR:
         square.innerHTML = door
         square.firstChild.addEventListener('click', () => {
-          if (gameData.points >= nextFloorCost) {
-            gameData.rooms = []
-            gameData.numItems = 0
-            createFloor(gameData.floor, gameData.player)
-            gameData.start = false
-            gameData.points -= nextFloorCost
-            gameData.floor++
-            // save all the current data
-            localStorage.setItem('gameData', JSON.stringify(gameData))
-          } else {
-            alert(`Need ${nextFloorCost - gameData.points} more points`)
-          }
-          updateInfo()
+          nextFloor()
         })
         break
       case CHEST:
@@ -209,7 +218,7 @@ function drawFloor(rooms) {
       targetId = Number(e.target.getAttribute('square-id'))
     } else if (e.target.parentNode.getAttribute('square-id')) {
       targetId = Number(e.target.parentNode.getAttribute('square-id'))
-    } else if (e.target.parentNode.parentNode.getAttribute('square-id')) {
+    } else if (e.target.parentNode.parentNode.getAttribute('square-id')) { // This is for Safari
       targetId = Number(e.target.parentNode.parentNode.getAttribute('square-id'))
     }
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
@@ -334,27 +343,10 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'door':
-        const nextFloorCost = Math.ceil(gameData.floor / 10)
-        if (gameData.points >= nextFloorCost) {
-          gameData.rooms = []
-          gameData.numItems = 0
-          createFloor(gameData.floor, targetId)
-          gameData.start = true
-          gameData.points -= nextFloorCost
-          gameData.floor++
-          // save all the current data
-          localStorage.setItem('gameData', JSON.stringify(gameData))
-          break
-        } else {
-          alert(`Need ${nextFloorCost - gameData.points} more points`)
-          return false
-        }
+        if (!nextFloor()) return false
     }
     updateInfo()
-    target.append(start.firstChild)
-    target.firstChild.remove()
-    gameData.rooms[targetId] = 0
-    updateRooms(targetId, startId)
+    movePiece(targetId, startId)
     if (gameData.numItems === 0) {
       // the floor is cleared
       const required = [door]
@@ -365,20 +357,7 @@ function movePlayer(targetId, startId) {
           door.innerHTML = required.pop()
           gameData.rooms[index] = DOOR
           door.addEventListener('click', () => {
-            const nextFloorCost = Math.ceil(gameData.floor / 10)
-            if (gameData.points >= nextFloorCost) {
-              gameData.rooms = []
-              gameData.numItems = 0
-              createFloor(gameData.floor, gameData.player)
-              gameData.start = false
-              gameData.points -= nextFloorCost
-              gameData.floor++
-              // save all the current data
-              localStorage.setItem('gameData', JSON.stringify(gameData))
-            } else {
-              alert(`Need ${nextFloorCost - gameData.points} more points`)
-            }
-            updateInfo()
+            nextFloor()
           })
         }
       }
@@ -432,9 +411,27 @@ function movePiece(targetId, startId) {
 }
 
 function updateRooms(targetId, startId) {
-  const temp = gameData.rooms[targetId]
   gameData.rooms[targetId] = gameData.rooms[startId]
-  gameData.rooms[startId] = temp
+  gameData.rooms[startId] = EMPTY
+}
+
+function nextFloor() {
+  const nextFloorCost = Math.ceil(gameData.floor / 10)
+  if (gameData.points >= nextFloorCost) {
+    gameData.rooms = []
+    gameData.numItems = 0
+    gameData.floor++
+    createFloor(gameData.floor, gameData.player)
+    gameData.start = false
+    gameData.points -= nextFloorCost
+    // save all the current data
+    localStorage.setItem('gameData', JSON.stringify(gameData))
+    updateInfo()
+    return true
+  } else {
+    alert(`Need ${nextFloorCost - gameData.points} more points`)
+    return false
+  }
 }
 
 function addTask() {
