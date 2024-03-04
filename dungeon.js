@@ -96,7 +96,6 @@ function createFloor(floor, start) {
     gameData.rooms = Array(64).fill(EMPTY)
     gameData.rooms[start] = PLAYER
     let floorPoints = floor + 2
-    console.log(floor, floorPoints)
     while (floorPoints > 0) {
       const room = Math.floor(Math.random() * 63) // select a random room
       if (gameData.rooms[room] === EMPTY
@@ -156,6 +155,7 @@ function createFloor(floor, start) {
 }
 
 function drawFloor(rooms) {
+  // console.log(gameData.numItems)
   dungeon.innerHTML = ''
   rooms.forEach((room, i) => {
     const square = document.createElement('div')
@@ -359,6 +359,8 @@ function movePlayer(targetId, startId) {
           door.addEventListener('click', () => {
             nextFloor()
           })
+          // save all the current data
+          localStorage.setItem('gameData', JSON.stringify(gameData))
         }
       }
     }
@@ -422,7 +424,7 @@ function nextFloor() {
     gameData.numItems = 0
     gameData.floor++
     createFloor(gameData.floor, gameData.player)
-    gameData.start = false
+    gameData.start = true
     gameData.points -= nextFloorCost
     // save all the current data
     localStorage.setItem('gameData', JSON.stringify(gameData))
