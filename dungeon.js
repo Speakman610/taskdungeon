@@ -2,12 +2,13 @@
 const EMPTY = 0
 const PLAYER = 1
 const DOOR = 2
-const CHEST = 3
-const KNIGHT = 4
-const BISHOP = 5
-const ROOK = 6
-const QUEEN = 7
-const BOSS = 8
+const PAWN = 3
+const CHEST = 4
+const KNIGHT = 5
+const BISHOP = 6
+const ROOK = 7
+const QUEEN = 8
+const BOSS = 9
 
 // Movement calculation
 const N_S_step = 8
@@ -95,7 +96,7 @@ function createFloor(floor, start) {
     gameData.rooms[start] = PLAYER
     let floorPoints = floor + 2
     while (floorPoints > 0) {
-      const room = Math.floor(Math.random() * 63) // select a random room
+      let room = Math.floor(Math.random() * 63) // select a random room
       if (gameData.rooms[room] === EMPTY
         && room !== start + W_E_step
         && room !== start - W_E_step
@@ -119,6 +120,7 @@ function createFloor(floor, start) {
           8 [10] - Knight or Bishop (2), Chest (2)
           9 [11] - Rook (2), Pawn (1)
           10 [12] - Knight or Bishop (4) - BOSS FLOOR
+          ...
           */
           if (floor % 7 === 0 && floorPoints >= 9) {
             // queen floor
@@ -138,7 +140,21 @@ function createFloor(floor, start) {
             floorPoints -= 2
           } else {
             // pawn (eventually)
-            gameData.rooms[room] = CHEST
+            if (room < 8 || room > 47) {
+              // the room is not valid for a pawn, so get a new one
+              do {
+                room = Math.floor(Math.random() * 39) + 8 // select a random room between 8 and 47
+              } while (gameData.rooms[room] !== EMPTY
+                || room === start + W_E_step
+                || room === start - W_E_step
+                || room === start + SW_NE_step
+                || room === start - SW_NE_step
+                || room === start + N_S_step
+                || room === start - N_S_step
+                || room === start + NW_SE_step
+                || room === start - NW_SE_step)
+            }
+            gameData.rooms[room] = PAWN
             floorPoints -= 1
           }
           gameData.numItems++
@@ -167,6 +183,9 @@ function drawFloor(rooms) {
         square.firstChild.addEventListener('click', () => {
           nextFloor()
         })
+        break
+      case PAWN:
+        square.innerHTML = pawn
         break
       case CHEST:
         square.innerHTML = chest
@@ -226,6 +245,15 @@ function drawFloor(rooms) {
         const startId = Number(square.getAttribute('square-id'))
         if (isOccupied(startId) && square.firstChild.classList.contains('monster')) {
           switch (square.firstChild.id) {
+            case 'pawn':
+              if (validatePawn(gameData.player, startId) && !gameData.moved.includes(startId)) {
+                movePiece(gameData.player, startId)
+                gameData.moved.push(gameData.player)
+                gameData.player = -1
+              } else if (!gameData.moved.includes(startId)) {
+                moveEnemy(startId, 'pawn')
+              }
+              break
             case 'knight':
               if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
                 movePiece(gameData.player, startId)
@@ -311,6 +339,9 @@ function movePlayer(targetId, startId) {
 
   if (isOccupied(targetId)) {
     switch (target.firstChild.id) {
+      case 'pawn':
+        gameData.numItems--
+        break
       case 'chest':
         gameData.knights++
         gameData.bishops++
@@ -376,6 +407,9 @@ function moveEnemy(startId, monsterType) {
   const possibleMoves = []
   for (let targetId = 0; targetId < 64; targetId++) {
     switch (monsterType) {
+      case 'pawn':
+        if (validatePawn(targetId, startId) && !isOccupied(targetId)) possibleMoves.push(targetId)
+        break
       case 'knight':
         if (validateKnight(targetId, startId) && !isOccupied(targetId)) possibleMoves.push(targetId)
         break
@@ -477,6 +511,19 @@ function refreshTaskList() {
 function updateInfo() {
   const info = document.getElementById('info')
   info.innerText = `Floor: ${gameData.floor}\nPoints: ${gameData.points}\nKnights: ${gameData.knights}\nBishops: ${gameData.bishops}\nRooks: ${gameData.rooks}`
+}
+
+function validatePawn(targetId, startId) {
+  const movingFromEtoW = isBoardEdge(startId).edge.includes('E') && isBoardEdge(targetId).edge.includes('W')
+  const movingFromWtoE = isBoardEdge(startId).edge.includes('W') && isBoardEdge(targetId).edge.includes('E')
+
+  if (!isOccupied(targetId) && targetId === startId + N_S_step) return true
+
+  if (isOccupied(targetId) && !movingFromEtoW && !movingFromWtoE && (targetId === startId + NW_SE_step || targetId === startId + SW_NE_step)) {
+      return true
+  }
+
+  return false
 }
 
 function validateDiagonal(targetId, startId, limit = false) {
