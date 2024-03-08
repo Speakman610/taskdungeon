@@ -366,7 +366,8 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'door':
-        if (gameData.numItems !== 0) return false
+        const nextFloorCost = Math.ceil(gameData.floor / 10)
+        if (gameData.numItems !== 0 || gameData.points < nextFloorCost) return false
         else gameData.numItems = -1
     }
     updateInfo()
