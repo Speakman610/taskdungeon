@@ -313,6 +313,11 @@ function movePlayer(targetId, startId) {
   const target = document.querySelector(`[square-id="${targetId}"]`)
   gameData.moved = []
 
+  // Save this out so we can refresh on move fail
+  const knightsBefore = gameData.knights
+  const bishopsBefore = gameData.bishops
+  const rooksBefore = gameData.rooks
+
   // The second check should be impossible
   if (startId === targetId || !isOccupied(startId)) return false
 
@@ -367,8 +372,16 @@ function movePlayer(targetId, startId) {
         break
       case 'door':
         const nextFloorCost = Math.ceil(gameData.floor / 10)
-        if (gameData.numItems !== 0 || gameData.points < nextFloorCost) return false
-        else gameData.numItems = -1
+        if (gameData.points >= nextFloorCost) {
+          gameData.numItems = -1
+        } else {
+          alert(`Need ${nextFloorCost - gameData.points} more points`)
+          gameData.knights = knightsBefore
+          gameData.bishops = bishopsBefore
+          gameData.rooks = rooksBefore
+          updateInfo()
+          return false
+        }
     }
     updateInfo()
     movePiece(targetId, startId)
