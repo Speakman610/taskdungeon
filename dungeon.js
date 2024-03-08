@@ -39,7 +39,6 @@ const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getI
   numItems: 0,
   player: 0,
   moved: [],
-  start: false,
   tasks: {}
 }
 
@@ -50,7 +49,6 @@ document.addEventListener('player-death', (e) => {
   setTimeout(() => {
     gameData.player = 0
     gameData.floor = 1
-    gameData.start = false
     gameData.rooms = []
     gameData.numItems = 0
     // save all the current data
@@ -223,56 +221,50 @@ function drawFloor(rooms) {
     }
     const startId = Number(draggedElement.parentNode.getAttribute('square-id'))
     if (movePlayer(targetId, startId)) {
-      gameData.player = targetId
-      gameData.moved = []
-
-      if (!gameData.start) {
-        const allSquares = document.querySelectorAll('#dungeon .square')
-        allSquares.forEach(square => {
-          const startId = Number(square.getAttribute('square-id'))
-          if (isOccupied(startId) && square.firstChild.classList.contains('monster')) {
-            switch (square.firstChild.id) {
-              case 'knight':
-                if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
-                  movePiece(gameData.player, startId)
-                  gameData.moved.push(gameData.player)
-                  gameData.player = -1
-                } else if (!gameData.moved.includes(startId)) {
-                  moveEnemy(startId, 'knight')
-                }
-                break
-              case 'bishop':
-                if (validateDiagonal(gameData.player, startId) && !gameData.moved.includes(startId)) {
-                  movePiece(gameData.player, startId)
-                  gameData.moved.push(gameData.player)
-                  gameData.player = -1
-                } else if (!gameData.moved.includes(startId)) {
-                  moveEnemy(startId, 'bishop')
-                }
-                break
-              case 'rook':
-                if (validateAdjacent(gameData.player, startId) && !gameData.moved.includes(startId)) {
-                  movePiece(gameData.player, startId)
-                  gameData.moved.push(gameData.player)
-                  gameData.player = -1
-                } else if (!gameData.moved.includes(startId)) {
-                  moveEnemy(startId, 'rook')
-                }
-                break
-              case 'queen':
-                if ((validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) && !gameData.moved.includes(startId)) {
-                  movePiece(gameData.player, startId)
-                  gameData.moved.push(gameData.player)
-                  gameData.player = -1
-                } else if (!gameData.moved.includes(startId)) {
-                  moveEnemy(startId, 'queen')
-                }
-                break
-            }
+      const allSquares = document.querySelectorAll('#dungeon .square')
+      allSquares.forEach(square => {
+        const startId = Number(square.getAttribute('square-id'))
+        if (isOccupied(startId) && square.firstChild.classList.contains('monster')) {
+          switch (square.firstChild.id) {
+            case 'knight':
+              if (validateKnight(gameData.player, startId) && !gameData.moved.includes(startId)) {
+                movePiece(gameData.player, startId)
+                gameData.moved.push(gameData.player)
+                gameData.player = -1
+              } else if (!gameData.moved.includes(startId)) {
+                moveEnemy(startId, 'knight')
+              }
+              break
+            case 'bishop':
+              if (validateDiagonal(gameData.player, startId) && !gameData.moved.includes(startId)) {
+                movePiece(gameData.player, startId)
+                gameData.moved.push(gameData.player)
+                gameData.player = -1
+              } else if (!gameData.moved.includes(startId)) {
+                moveEnemy(startId, 'bishop')
+              }
+              break
+            case 'rook':
+              if (validateAdjacent(gameData.player, startId) && !gameData.moved.includes(startId)) {
+                movePiece(gameData.player, startId)
+                gameData.moved.push(gameData.player)
+                gameData.player = -1
+              } else if (!gameData.moved.includes(startId)) {
+                moveEnemy(startId, 'rook')
+              }
+              break
+            case 'queen':
+              if ((validateDiagonal(gameData.player, startId) || validateAdjacent(gameData.player, startId)) && !gameData.moved.includes(startId)) {
+                movePiece(gameData.player, startId)
+                gameData.moved.push(gameData.player)
+                gameData.player = -1
+              } else if (!gameData.moved.includes(startId)) {
+                moveEnemy(startId, 'queen')
+              }
+              break
           }
-        })
-      }
-      gameData.start = false
+        }
+      })
       if (gameData.player === -1) {
         document.dispatchEvent(new CustomEvent('player-death'))
       }
@@ -291,7 +283,7 @@ function drawFloor(rooms) {
 
 function movePlayer(targetId, startId) {
   const target = document.querySelector(`[square-id="${targetId}"]`)
-  const start = document.querySelector(`[square-id="${startId}"]`)
+  gameData.moved = []
 
   // The second check should be impossible
   if (startId === targetId || !isOccupied(startId)) return false
@@ -343,10 +335,18 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'door':
-        if (!nextFloor()) return false
+        if (gameData.numItems !== 0) return false
+        else gameData.numItems = -1
     }
     updateInfo()
     movePiece(targetId, startId)
+    gameData.player = targetId
+    if (gameData.numItems === -1) {
+      nextFloor()
+      // save all the current data
+      localStorage.setItem('gameData', JSON.stringify(gameData))
+      return false
+    }
     if (gameData.numItems === 0) {
       // the floor is cleared
       const required = [door]
@@ -366,8 +366,8 @@ function movePlayer(targetId, startId) {
     }
     return true
   } else {
-    updateRooms(targetId, startId)
-    target.append(start.firstChild)
+    movePiece(targetId, startId)
+    gameData.player = targetId
     return true
   }
 }
@@ -424,7 +424,6 @@ function nextFloor() {
     gameData.numItems = 0
     gameData.floor++
     createFloor(gameData.floor, gameData.player)
-    gameData.start = true
     gameData.points -= nextFloorCost
     // save all the current data
     localStorage.setItem('gameData', JSON.stringify(gameData))
