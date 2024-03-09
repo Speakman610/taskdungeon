@@ -451,25 +451,9 @@ function moveEnemy(startId, monsterType) {
     if (monsterType === 'pawn' && targetId > 55) {
       // this pawn needs to promote
       const square = document.querySelector(`[square-id="${targetId}"]`)
-      const piece = Math.floor(Math.random() * 3) + 5 // select a random number between 5 and 8
-      switch (piece) {
-        case KNIGHT:
-          square.innerHTML = knight
-          gameData.rooms[targetId] = KNIGHT
-          break
-        case BISHOP:
-          square.innerHTML = bishop
-          gameData.rooms[targetId] = BISHOP
-          break
-        case ROOK:
-          square.innerHTML = rook
-          gameData.rooms[targetId] = ROOK
-          break
-        case QUEEN:
-          square.innerHTML = queen
-          gameData.rooms[targetId] = QUEEN
-          break
-      }
+      // we will always make it a queen because that is cool
+      square.innerHTML = queen
+      gameData.rooms[targetId] = QUEEN
     }
   }
 }
