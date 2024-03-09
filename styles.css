@@ -92,6 +92,15 @@ li:hover {
   color: var(--accent);
 }
 
+#info {
+  margin: 20px 0px;
+  height: 320px; 
+}
+
+#point-container {
+  margin: 0;
+}
+
 .info-icon {
   background-color: var(--light);
   position: relative;

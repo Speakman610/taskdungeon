@@ -354,26 +354,26 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'chest':
-        gameData.knights = Math.min(gameData.knights + 1, 99)
-        gameData.bishops = Math.min(gameData.bishops + 1, 99)
-        gameData.rooks = Math.min(gameData.rooks + 1, 99)
+        gameData.knights = Math.min(gameData.knights + 1, 999)
+        gameData.bishops = Math.min(gameData.bishops + 1, 999)
+        gameData.rooks = Math.min(gameData.rooks + 1, 999)
         gameData.numItems--
         break
       case 'knight':
-        gameData.knights = Math.min(gameData.knights + 1, 99)
+        gameData.knights = Math.min(gameData.knights + 1, 999)
         gameData.numItems--
         break
       case 'bishop':
-        gameData.bishops = Math.min(gameData.bishops + 1, 99)
+        gameData.bishops = Math.min(gameData.bishops + 1, 999)
         gameData.numItems--
         break
       case 'rook':
-        gameData.rooks = Math.min(gameData.rooks + 1, 99)
+        gameData.rooks = Math.min(gameData.rooks + 1, 999)
         gameData.numItems--
         break
       case 'queen':
-        gameData.bishops = Math.min(gameData.bishops + 1, 99)
-        gameData.rooks = Math.min(gameData.rooks + 1, 99)
+        gameData.bishops = Math.min(gameData.bishops + 1, 999)
+        gameData.rooks = Math.min(gameData.rooks + 1, 999)
         gameData.numItems--
         break
       case 'door':
