@@ -16,7 +16,7 @@ const W_E_step = 1
 const NW_SE_step = 9
 const SW_NE_step = 7
 
-// SVGs for pieces and stuff
+// SVGs for game icons
 const star = '<div class="room" id="start"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg></div>'
 const chest = '<div class="room" id="chest"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M190.5 68.8L225.3 128H224 152c-22.1 0-40-17.9-40-40s17.9-40 40-40h2.2c14.9 0 28.8 7.9 36.3 20.8zM64 88c0 14.4 3.5 28 9.6 40H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32H480c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32H438.4c6.1-12 9.6-25.6 9.6-40c0-48.6-39.4-88-88-88h-2.2c-31.9 0-61.5 16.9-77.7 44.4L256 85.5l-24.1-41C215.7 16.9 186.1 0 154.2 0H152C103.4 0 64 39.4 64 88zm336 0c0 22.1-17.9 40-40 40H288h-1.3l34.8-59.2C329.1 55.9 342.9 48 357.8 48H360c22.1 0 40 17.9 40 40zM32 288V464c0 26.5 21.5 48 48 48H224V288H32zM288 512H432c26.5 0 48-21.5 48-48V288H288V512z"/></svg></div>'
 const door = '<div class="room" id="door"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M336.6 156.5c1.3 1.1 2.7 2.2 3.9 3.3c9.3 8.2 23 10.5 33.4 3.6l67.6-45.1c11.4-7.6 14.2-23.2 5.1-33.4C430 66.6 410.9 50.6 389.7 37.6c-11.9-7.3-26.9-1.4-32.1 11.6l-30.5 76.2c-4.5 11.1 .2 23.6 9.5 31.2zM328 36.8c5.1-12.8-1.6-27.4-15-30.5C294.7 2.2 275.6 0 256 0s-38.7 2.2-57 6.4C185.5 9.4 178.8 24 184 36.8l30.3 75.8c4.5 11.3 16.8 17.2 29 16c4.2-.4 8.4-.6 12.7-.6s8.6 .2 12.7 .6c12.1 1.2 24.4-4.7 29-16L328 36.8zM65.5 85c-9.1 10.2-6.3 25.8 5.1 33.4l67.6 45.1c10.3 6.9 24.1 4.6 33.4-3.6c1.3-1.1 2.6-2.3 4-3.3c9.3-7.5 13.9-20.1 9.5-31.2L154.4 49.2c-5.2-12.9-20.3-18.8-32.1-11.6C101.1 50.6 82 66.6 65.5 85zm314 137.1c.9 3.3 1.7 6.6 2.3 10c2.5 13 13 23.9 26.2 23.9h80c13.3 0 24.1-10.8 22.9-24c-2.5-27.2-9.3-53.2-19.7-77.3c-5.5-12.9-21.4-16.6-33.1-8.9l-68.6 45.7c-9.8 6.5-13.2 19.2-10 30.5zM53.9 145.8c-11.6-7.8-27.6-4-33.1 8.9C10.4 178.8 3.6 204.8 1.1 232c-1.2 13.2 9.6 24 22.9 24h80c13.3 0 23.8-10.8 26.2-23.9c.6-3.4 1.4-6.7 2.3-10c3.1-11.4-.2-24-10-30.5L53.9 145.8zM104 288H24c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V312c0-13.3-10.7-24-24-24zm304 0c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V312c0-13.3-10.7-24-24-24H408zM24 416c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V440c0-13.3-10.7-24-24-24H24zm384 0c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V440c0-13.3-10.7-24-24-24H408zM272 192c0-8.8-7.2-16-16-16s-16 7.2-16 16V464c0 8.8 7.2 16 16 16s16-7.2 16-16V192zm-64 32c0-8.8-7.2-16-16-16s-16 7.2-16 16V464c0 8.8 7.2 16 16 16s16-7.2 16-16V224zm128 0c0-8.8-7.2-16-16-16s-16 7.2-16 16V464c0 8.8 7.2 16 16 16s16-7.2 16-16V224z"/></svg></div>'
@@ -28,6 +28,12 @@ const knight = '<div class="monster" id="knight"><svg xmlns="http://www.w3.org/2
 const pawn = '<div class="monster" id="pawn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M215.5 224c29.2-18.4 48.5-50.9 48.5-88c0-57.4-46.6-104-104-104S56 78.6 56 136c0 37.1 19.4 69.6 48.5 88H96c-17.7 0-32 14.3-32 32c0 16.5 12.5 30 28.5 31.8L80 400H240L227.5 287.8c16-1.8 28.5-15.3 28.5-31.8c0-17.7-14.3-32-32-32h-8.5zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H281.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L256 432H64L22.6 473.4z"/></svg></div>'
 const player = '<div class="player" id="player"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M180.5 141.5C219.7 108.5 272.6 80 336 80s116.3 28.5 155.5 61.5c39.1 33 66.9 72.4 81 99.8c4.7 9.2 4.7 20.1 0 29.3c-14.1 27.4-41.9 66.8-81 99.8C452.3 403.5 399.4 432 336 432s-116.3-28.5-155.5-61.5c-16.2-13.7-30.5-28.5-42.7-43.1L48.1 379.6c-12.5 7.3-28.4 5.3-38.7-4.9S-3 348.7 4.2 336.1L50 256 4.2 175.9c-7.2-12.6-5-28.4 5.3-38.6s26.1-12.2 38.7-4.9l89.7 52.3c12.2-14.6 26.5-29.4 42.7-43.1zM448 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg></div>'
 
+// Color codes
+const color_dark = '#0f2f3b'
+const color_light = '#167c87'
+const color_player = '#ffa324'
+const color_accent = '#b0fff8'
+const color_monster = '#771f34'
 // Objects for game
 const dungeon = document.querySelector('#dungeon')
 const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getItem('gameData')) : {
@@ -43,7 +49,7 @@ const gameData = localStorage.getItem('gameData') ? JSON.parse(localStorage.getI
   tasks: {}
 }
 
-updateInfo()
+updateInfo(false)
 refreshTaskList()
 
 document.addEventListener('player-death', (e) => {
@@ -348,26 +354,26 @@ function movePlayer(targetId, startId) {
         gameData.numItems--
         break
       case 'chest':
-        gameData.knights++
-        gameData.bishops++
-        gameData.rooks++
+        gameData.knights = Math.min(gameData.knights + 1, 99)
+        gameData.bishops = Math.min(gameData.bishops + 1, 99)
+        gameData.rooks = Math.min(gameData.rooks + 1, 99)
         gameData.numItems--
         break
       case 'knight':
-        gameData.knights++
+        gameData.knights = Math.min(gameData.knights + 1, 99)
         gameData.numItems--
         break
       case 'bishop':
-        gameData.bishops++
+        gameData.bishops = Math.min(gameData.bishops + 1, 99)
         gameData.numItems--
         break
       case 'rook':
-        gameData.rooks++
+        gameData.rooks = Math.min(gameData.rooks + 1, 99)
         gameData.numItems--
         break
       case 'queen':
-        gameData.bishops++
-        gameData.rooks++
+        gameData.bishops = Math.min(gameData.bishops + 1, 99)
+        gameData.rooks = Math.min(gameData.rooks + 1, 99)
         gameData.numItems--
         break
       case 'door':
@@ -545,9 +551,62 @@ function refreshTaskList() {
   }
 }
 
-function updateInfo() {
-  const info = document.getElementById('info')
-  info.innerText = `Floor: ${gameData.floor}\nPoints: ${gameData.points}\nKnights: ${gameData.knights}\nBishops: ${gameData.bishops}\nRooks: ${gameData.rooks}`
+function updateInfo(changeColors=true) {
+  const TIMEOUT = 150
+  const floor = document.getElementById('floor')
+  floor.innerText = gameData.floor
+
+  // update points
+  const points = document.getElementById('points')
+  if (changeColors) {
+    if (Number(points.innerText) < gameData.points) {
+      points.style.color = color_player
+      setTimeout(() => points.style.color = color_light, TIMEOUT)
+    } else if (Number(points.innerText) > gameData.points) {
+      points.style.color = color_monster
+      setTimeout(() => points.style.color = color_light, TIMEOUT)
+    }
+  }
+  points.innerText = gameData.points
+
+  // update knights
+  const knights = document.getElementById('knight-points')
+  if (changeColors) {
+    if (Number(knights.innerText) < gameData.knights) {
+      knights.style.backgroundColor = color_player
+      setTimeout(() => knights.style.backgroundColor = color_accent, TIMEOUT)
+    } else if (Number(knights.innerText) > gameData.knights) {
+      knights.style.backgroundColor = color_monster
+      setTimeout(() => knights.style.backgroundColor = color_accent, TIMEOUT)
+    }
+  }
+  knights.innerText = gameData.knights
+
+  // update bishops
+  const bishops = document.getElementById('bishop-points')
+  if (changeColors) {
+    if (Number(bishops.innerText) < gameData.bishops) {
+      bishops.style.backgroundColor = color_player
+      setTimeout(() => bishops.style.backgroundColor = color_accent, TIMEOUT)
+    } else if (Number(bishops.innerText) > gameData.bishops) {
+      bishops.style.backgroundColor = color_monster
+      setTimeout(() => bishops.style.backgroundColor = color_accent, TIMEOUT)
+    }
+  }
+  bishops.innerText = gameData.bishops
+
+  // update rooks
+  const rooks = document.getElementById('rook-points')
+  if (changeColors) {
+    if (Number(rooks.innerText) < gameData.rooks) {
+      rooks.style.backgroundColor = color_player
+      setTimeout(() => rooks.style.backgroundColor = color_accent, TIMEOUT)
+    } else if (Number(rooks.innerText) > gameData.rooks) {
+      rooks.style.backgroundColor = color_monster
+      setTimeout(() => rooks.style.backgroundColor = color_accent, TIMEOUT)
+    }
+  }
+  rooks.innerText = gameData.rooks
 }
 
 function validatePawn(targetId, startId) {

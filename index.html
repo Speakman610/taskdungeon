@@ -9,12 +9,26 @@
     <title>Task Dungeon</title>
   </head>
   <body>
-    <h1>Task Dungeon</h1>
+    <h1>Task Dungeon : Floor <span id="floor">1</span></h1>
     <div id="game">
       <div id="dungeon">
         <!-- The dungeon will be generated here -->
       </div>
-      <h3 id="info"></h3>
+      <div id="info">
+        <h2><span id="points">0</span> Points</h2>
+        <div class="info-icon">
+          <img src="./assets/chess-knight-solid.svg" />
+          <span id="knight-points" class="icon-notif">0</span>
+        </div>
+        <div class="info-icon">
+          <img src="./assets/chess-bishop-solid.svg" />
+          <span id="bishop-points" class="icon-notif">0</span>
+        </div>
+        <div class="info-icon">
+          <img src="./assets/chess-rook-solid.svg" />
+          <span id="rook-points" class="icon-notif">0</span>
+        </div>
+      </div>
     </div>
     <div id="tasks">
       <h2>Remaining Tasks</h2>

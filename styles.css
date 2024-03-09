@@ -1,12 +1,4 @@
 :root {
-  /* faded */
-  /* --dark: #2c3437;
-  --light: #66787a;
-  --accent: #cfa790;
-  --player: #6ebcbd;
-  --monster: #70444e; */
-
-  /* bright */
   --dark: #0f2f3b;
   --light: #167c87;
   --accent: #b0fff8;
@@ -98,4 +90,44 @@ li {
 
 li:hover {
   color: var(--accent);
+}
+
+.info-icon {
+  background-color: var(--light);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: none;
+  outline: none;
+  border-radius: 50%;
+  margin-top: 20px;
+}
+
+.icon-notif {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--accent);
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: large;
+  transition: all 0.2s;
+}
+
+.info-icon img {
+  width: 30px;
+  height: 30px;
+}
+
+#points {
+  transition: all 0.2s;
 }
