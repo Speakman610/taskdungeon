@@ -55,12 +55,12 @@ refreshTaskList()
 document.addEventListener('player-death', (e) => {
   setTimeout(() => {
     gameData.player = 0
-    gameData.floor = 1
+    gameData.floor = Math.max(gameData.floor - 10, 1)
     gameData.rooms = []
     gameData.numItems = 0
     // save all the current data
     localStorage.setItem('gameData', JSON.stringify(gameData))
-    alert('You were captured by an enemy piece! Back to the first floor...')
+    alert(`You were captured by an enemy piece! Back to floor ${gameData.floor}...`)
     createFloor(gameData.floor, gameData.player)
     updateInfo()
   }, 100)
@@ -77,12 +77,13 @@ document.addEventListener('player-death', (e) => {
 
   Minions:
   - Pawn
-  - Bishop
-  - Knight
-  - Rook
+  - Bishop (attack if possible)
+  - Knight (protect if possible)
+  - Rook (box in if possible)
+  - Queen ()
 
   Bosses:
-  - Snake
+  - Snake (maybe the boss could be the snake from the classic snake game)
   - Horse
   - Goat
   - Monkey
