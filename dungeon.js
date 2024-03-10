@@ -60,7 +60,7 @@ document.addEventListener('player-death', (e) => {
     gameData.numItems = 0
     // save all the current data
     localStorage.setItem('gameData', JSON.stringify(gameData))
-    alert(`You were captured by an enemy piece! Back to floor ${gameData.floor}...`)
+    alert(`You were captured by an enemy piece! Retreating to floor ${gameData.floor}...`)
     createFloor(gameData.floor, gameData.player)
     updateInfo()
   }, 100)
