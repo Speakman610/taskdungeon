@@ -94,7 +94,10 @@ li:hover {
 
 #info {
   margin: 20px 0px;
-  height: 320px; 
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 #point-container {
@@ -112,7 +115,7 @@ li:hover {
   border: none;
   outline: none;
   border-radius: 50%;
-  margin-top: 20px;
+  margin: 10px 0px;
 }
 
 .icon-notif {
