@@ -480,7 +480,8 @@ function updateRooms(targetId, startId) {
 }
 
 function nextFloor() {
-  const nextFloorCost = Math.ceil(gameData.floor / 10)
+  // the maximum floor cost should be 10
+  const nextFloorCost = Math.min(Math.ceil(gameData.floor / 10), 10)
   if (gameData.points >= nextFloorCost) {
     gameData.rooms = []
     gameData.numItems = 0
