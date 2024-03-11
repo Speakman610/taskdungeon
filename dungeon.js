@@ -545,54 +545,58 @@ function updateInfo(changeColors=true) {
   // update points
   const points = document.getElementById('points')
   if (changeColors) {
-    if (Number(points.innerText) < gameData.points) {
+    if (Number(points.value) < gameData.points) {
       points.style.backgroundColor = color_player
       setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
-    } else if (Number(points.innerText) > gameData.points) {
+    } else if (Number(points.value) > gameData.points) {
       points.style.backgroundColor = color_monster
       setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
   points.innerText = gameData.points > 99 ? '99+' : gameData.points
+  points.value = gameData.points
 
   // update knights
   const knights = document.getElementById('knight-points')
   if (changeColors) {
-    if (Number(knights.innerText) < gameData.knights) {
+    if (Number(knights.value) < gameData.knights) {
       knights.style.backgroundColor = color_player
       setTimeout(() => knights.style.backgroundColor = color_accent, TIMEOUT)
-    } else if (Number(knights.innerText) > gameData.knights) {
+    } else if (Number(knights.value) > gameData.knights) {
       knights.style.backgroundColor = color_monster
       setTimeout(() => knights.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
   knights.innerText = gameData.knights > 99 ? '99+' : gameData.knights
+  knights.value = gameData.knights
 
   // update bishops
   const bishops = document.getElementById('bishop-points')
   if (changeColors) {
-    if (Number(bishops.innerText) < gameData.bishops) {
+    if (Number(bishops.value) < gameData.bishops) {
       bishops.style.backgroundColor = color_player
       setTimeout(() => bishops.style.backgroundColor = color_accent, TIMEOUT)
-    } else if (Number(bishops.innerText) > gameData.bishops) {
+    } else if (Number(bishops.value) > gameData.bishops) {
       bishops.style.backgroundColor = color_monster
       setTimeout(() => bishops.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
   bishops.innerText = gameData.bishops > 99 ? '99+' : gameData.bishops
+  bishops.value = gameData.bishops
 
   // update rooks
   const rooks = document.getElementById('rook-points')
   if (changeColors) {
-    if (Number(rooks.innerText) < gameData.rooks) {
+    if (Number(rooks.value) < gameData.rooks) {
       rooks.style.backgroundColor = color_player
       setTimeout(() => rooks.style.backgroundColor = color_accent, TIMEOUT)
-    } else if (Number(rooks.innerText) > gameData.rooks) {
+    } else if (Number(rooks.value) > gameData.rooks) {
       rooks.style.backgroundColor = color_monster
       setTimeout(() => rooks.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
   rooks.innerText = gameData.rooks > 99 ? '99+' : gameData.rooks
+  rooks.value = gameData.rooks
 }
 
 function validatePawn(targetId, startId) {
