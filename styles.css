@@ -100,10 +100,6 @@ li:hover {
   justify-content: center;
 }
 
-#point-container {
-  margin: 0;
-}
-
 .info-icon {
   background-color: var(--light);
   position: relative;
