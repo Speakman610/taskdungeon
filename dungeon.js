@@ -547,10 +547,10 @@ function updateInfo(changeColors=true) {
   if (changeColors) {
     if (Number(points.innerText) < gameData.points) {
       points.style.backgroundColor = color_player
-      setTimeout(() => points.style.backgroundColor = color_light, TIMEOUT)
+      setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
     } else if (Number(points.innerText) > gameData.points) {
       points.style.backgroundColor = color_monster
-      setTimeout(() => points.style.backgroundColor = color_light, TIMEOUT)
+      setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
   points.innerText = gameData.points
