@@ -546,14 +546,14 @@ function updateInfo(changeColors=true) {
   const points = document.getElementById('points')
   if (changeColors) {
     if (Number(points.value) < gameData.points) {
-      points.style.backgroundColor = color_player
-      setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
+      points.style.backgroundColor = color_accent
+      setTimeout(() => points.style.backgroundColor = color_player, TIMEOUT)
     } else if (Number(points.value) > gameData.points) {
       points.style.backgroundColor = color_monster
-      setTimeout(() => points.style.backgroundColor = color_accent, TIMEOUT)
+      setTimeout(() => points.style.backgroundColor = color_player, TIMEOUT)
     }
   }
-  points.innerText = gameData.points > 99 ? '99+' : gameData.points
+  points.innerText = gameData.points > 999 ? '999+' : gameData.points
   points.value = gameData.points
 
   // update knights
