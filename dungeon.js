@@ -546,11 +546,11 @@ function updateInfo(changeColors=true) {
   const points = document.getElementById('points')
   if (changeColors) {
     if (Number(points.innerText) < gameData.points) {
-      points.style.color = color_player
-      setTimeout(() => points.style.color = color_light, TIMEOUT)
+      points.style.backgroundColor = color_player
+      setTimeout(() => points.style.backgroundColor = color_light, TIMEOUT)
     } else if (Number(points.innerText) > gameData.points) {
-      points.style.color = color_monster
-      setTimeout(() => points.style.color = color_light, TIMEOUT)
+      points.style.backgroundColor = color_monster
+      setTimeout(() => points.style.backgroundColor = color_light, TIMEOUT)
     }
   }
   points.innerText = gameData.points
