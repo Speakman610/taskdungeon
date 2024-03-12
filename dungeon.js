@@ -567,7 +567,7 @@ function updateInfo(changeColors=true) {
       setTimeout(() => knights.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
-  knights.innerText = gameData.knights > 99 ? '99+' : gameData.knights
+  knights.innerText = gameData.knights
   knights.value = gameData.knights
 
   // update bishops
@@ -581,7 +581,7 @@ function updateInfo(changeColors=true) {
       setTimeout(() => bishops.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
-  bishops.innerText = gameData.bishops > 99 ? '99+' : gameData.bishops
+  bishops.innerText = gameData.bishops
   bishops.value = gameData.bishops
 
   // update rooks
@@ -595,7 +595,7 @@ function updateInfo(changeColors=true) {
       setTimeout(() => rooks.style.backgroundColor = color_accent, TIMEOUT)
     }
   }
-  rooks.innerText = gameData.rooks > 99 ? '99+' : gameData.rooks
+  rooks.innerText = gameData.rooks
   rooks.value = gameData.rooks
 }
 
